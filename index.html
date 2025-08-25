@@ -3,115 +3,121 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Pomodoro Timer</title>
+  <title>Login - Pomodoro Timer</title>
   <link rel="stylesheet" href="styles.css" />
   <link rel="icon" href="data:," />
+
+  <!-- Font Awesome for eye/eye-slash icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .login-card {
+      width: 100%;
+      max-width: 400px;
+      position: relative;
+    }
+    .login-card label {
+      display: block;
+      margin-bottom: 12px;
+    }
+    .login-card input[type="text"],
+    .login-card input[type="password"] {
+      width: 100%;
+      padding-right: 40px; /* make space for eye icon */
+    }
+    .password-wrapper {
+      position: relative;
+    }
+    .toggle-password {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 18px;
+      color: var(--fg-muted, #777);
+    }
+    .toggle-password:hover {
+      color: var(--brand, #4f46e5);
+    }
+  </style>
 </head>
 <body>
-  <header class="app-header">
-    <div class="brand">
-      <img id="brandLogo" alt="Logo" />
-      <h1>Pomodoro Timer</h1>
-    </div>
-    <div class="brand-controls">
-      <label class="inline">
-        Theme color:
-        <input type="color" id="themeColor" value="#4f46e5" />
-      </label>
-      <label class="inline">
-        Logo URL:
-        <input type="url" id="logoUrl" placeholder="https://example.com/logo.png" />
-      </label>
-      <button id="applyBrand" class="btn sm">Apply</button>
-    </div>
-  </header>
-
-  <main class="container">
-    <section class="timer-card">
-      <div class="mode-tabs" role="tablist" aria-label="Timer modes">
-        <button class="tab active" data-mode="work">Work</button>
-        <button class="tab" data-mode="short">Short Break</button>
-        <button class="tab" data-mode="long">Long Break</button>
+  <main class="login-card timer-card">
+    <h2 style="text-align:center; margin-bottom:16px;">Pomodoro Timer</h2>
+    <h5 style="text-align:center; margin-bottom:16px;">v1.1 </h5>
+    <form id="loginForm" class="settings">
+      <div>
+        <label>
+          Username
+          <input type="text" id="username" required />
+        </label>
+        <label>
+          Password
+          <div class="password-wrapper">
+            <input type="password" id="password" required />
+            <i id="togglePassword" class="fa-solid fa-eye-slash toggle-password"></i>
+          </div>
+        </label>
       </div>
-
-      <div class="timer-display">
-        <div id="countdown">25:00</div>
-        <div class="cycle-info">
-          <span>Completed Pomodoros today: <strong id="todayCount">0</strong></span>
-          <span>Cycle: <strong id="cycleLabel">1 / 4</strong></span>
-        </div>
+      <div style="text-align:center; margin-top:12px;">
+        <button type="submit" class="btn primary">Login</button>
       </div>
-
-      <div class="controls">
-        <button id="startBtn" class="btn primary">Start</button>
-        <button id="pauseBtn" class="btn">Pause</button>
-        <button id="resetBtn" class="btn">Reset</button>
-        <button id="skipBtn" class="btn danger">Skip</button>
-      </div>
-
-      <details class="settings">
-        <summary>Customize Durations</summary>
-        <div class="grid">
-          <label>
-            Work (min)
-            <input type="number" id="workMins" min="1" max="120" value="25" />
-          </label>
-          <label>
-            Short Break (min)
-            <input type="number" id="shortMins" min="1" max="60" value="5" />
-          </label>
-          <label>
-            Long Break (min)
-            <input type="number" id="longMins" min="1" max="60" value="15" />
-          </label>
-          <label>
-            Long break every N pomodoros
-            <input type="number" id="longEvery" min="2" max="12" value="4" />
-          </label>
-        </div>
-        <div class="grid">
-          <label>
-            Sounds
-            <select id="soundLevel">
-              <option value="quiet">Quiet</option>
-              <option value="normal" selected>Normal</option>
-              <option value="loud">Loud</option>
-              <option value="off">Off</option>
-            </select>
-          </label>
-          <label class="checkbox">
-            <input type="checkbox" id="notifyToggle" />
-            Enable notifications
-          </label>
-          <button id="saveSettings" class="btn primary sm">Save Settings</button>
-        </div>
-      </details>
-    </section>
-
-    <section class="report-card">
-      <h2>History</h2>
-      <div class="stats">
-        <div class="stat">
-          <div class="stat-value" id="todayMinutes">0</div>
-          <div class="stat-label">Focused minutes today</div>
-        </div>
-        <div class="stat">
-          <div class="stat-value" id="weekTotal">0</div>
-          <div class="stat-label">Pomodoros (last 7 days)</div>
-        </div>
-      </div>
-      <canvas id="weekChart" width="700" height="220" aria-label="Weekly bar chart"></canvas>
-      <div class="export-row">
-        <button id="exportCsv" class="btn sm">Export CSV</button>
-        <button id="clearHistory" class="btn danger sm">Clear History</button>
-      </div>
-    </section>
+    </form>
+    <p id="errorMsg" style="color: var(--danger); text-align:center; margin-top:10px; display:none;">
+      Invalid username or password.
+    </p>
   </main>
 
-  <footer class="app-footer">
-    <small>Anonymous-friendly • Works offline after first load • Data stored locally</small>
-  </footer>
+  <script>
+    // ---------- Branding ----------
+    const defaultPrefs = { themeColor: '#4f46e5', logoUrl: '' };
+    function loadPrefs() {
+      try {
+        const raw = localStorage.getItem('pomodoro.pref.v1');
+        return raw ? { ...defaultPrefs, ...JSON.parse(raw) } : defaultPrefs;
+      } catch { return defaultPrefs; }
+    }
+    function applyBranding() {
+      const prefs = loadPrefs();
+      document.documentElement.style.setProperty('--brand', prefs.themeColor || defaultPrefs.themeColor);
+    }
+    applyBranding();
 
-  <script src="app.js"></script>
+    // ---------- Show/Hide Password ----------
+    const passwordField = document.getElementById("password");
+    const toggleIcon = document.getElementById("togglePassword");
+
+    toggleIcon.addEventListener("click", function () {
+      const isHidden = passwordField.type === "password";
+      passwordField.type = isHidden ? "text" : "password";
+      toggleIcon.classList.toggle("fa-eye", isHidden);
+      toggleIcon.classList.toggle("fa-eye-slash", !isHidden);
+    });
+
+    // ---------- Login ----------
+    const form = document.getElementById('loginForm');
+    const errorMsg = document.getElementById('errorMsg');
+
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      const user = document.getElementById('username').value.trim();
+      const pass = document.getElementById('password').value.trim();
+
+      if(user === "Admin" && pass === "021988"){
+        localStorage.setItem("loggedIn", "true");
+        window.location.href = "login.html"; // redirect to Pomodoro app
+      } else {
+        errorMsg.style.display = "block";
+      }
+    });
+  </script>
 </body>
 </html>
