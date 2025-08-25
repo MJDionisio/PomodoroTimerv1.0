@@ -64,11 +64,10 @@ Features:
   let state = {
     mode: 'work',           // 'work' | 'short' | 'long'
     running: false,
-    // timestamps in ms
-    startedAt: null,        // when this stretch began (wall clock)
-    endsAt: null,           // when current stretch should end (wall clock)
-    pausedRemaining: null,  // ms remaining when paused
-    cycleIndex: 1,          // 1..longEvery
+    startedAt: null,
+    endsAt: null,
+    pausedRemaining: null,
+    cycleIndex: 1,
     todayPomodoros: 0
   };
 
@@ -76,15 +75,12 @@ Features:
   applyPrefsToUI();
   applyBranding();
 
-  // resume from saved state
   const saved = loadState();
   if (saved) {
     state = { ...state, ...saved };
-    // reconcile time
     reconcileTimer();
     updateUI();
   } else {
-    // init UI from prefs
     setMode('work', false);
     updateUI();
   }
@@ -111,7 +107,6 @@ Features:
     savePrefs();
 
     if (prefs.notify) ensureNotificationPermission();
-    // If mode changed duration, adjust if not running
     if (!state.running) setMode(state.mode, false);
     drawChart();
   });
@@ -124,7 +119,6 @@ Features:
   });
 
   window.addEventListener('beforeunload', (e) => {
-    // Warn only if running
     if (state.running) {
       e.preventDefault();
       e.returnValue = '';
@@ -141,7 +135,6 @@ Features:
   });
 
   // ---------- Timer Engine ----------
-  let rafTimer = null; // using setInterval for second tick. requestAnimationFrame not needed.
   let tickInterval = null;
 
   function setMode(mode, userClickedTab) {
@@ -152,7 +145,6 @@ Features:
     state.pausedRemaining = getModeMs(mode);
     saveState();
 
-    // update tabs if set programmatically
     if (!userClickedTab) {
       tabs.forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
     }
@@ -202,16 +194,13 @@ Features:
   }
 
   function completeCurrent(skipped = false) {
-    // record history if completed a work session (not if skipped from work before finishing)
     const finishedWork = state.mode === 'work' && !skipped;
     if (finishedWork) {
       incrementHistoryForToday(1);
       state.todayPomodoros = getTodayPomodoros();
-      // advance cycle
       state.cycleIndex = (state.cycleIndex % prefs.longEvery) + 1;
     }
 
-    // next mode
     let nextMode;
     if (state.mode === 'work') {
       nextMode = (state.cycleIndex === 1) ? 'long' : 'short';
@@ -237,7 +226,6 @@ Features:
     tickInterval = setInterval(() => {
       const remaining = getRemainingMs();
       if (remaining <= 0) {
-        // finish interval
         stopTicking();
         notify('Time’s up!', `Completed: ${labelFor(state.mode)}`);
         playChime('end');
@@ -245,7 +233,7 @@ Features:
         return;
       }
       renderTime(remaining);
-    }, 250); // 4x per second for smoothness on resume
+    }, 250);
   }
   function stopTicking() {
     if (tickInterval) {
@@ -265,36 +253,27 @@ Features:
     if (!state.startedAt || !state.endsAt) return;
     const remaining = state.endsAt - Date.now();
     if (remaining <= 0) {
-      // The interval finished while away
-      // Count it as completed if it was a work session
       if (state.mode === 'work') {
         incrementHistoryForToday(1);
         state.todayPomodoros = getTodayPomodoros();
         state.cycleIndex = (state.cycleIndex % prefs.longEvery) + 1;
       }
-      // Next mode as per normal rule
       const next = (state.mode === 'work')
         ? (state.cycleIndex === 1 ? 'long' : 'short')
         : 'work';
       setMode(next, false);
-      // Not auto-starting next on resume; keep paused
       state.running = false;
       saveState();
     }
   }
 
   function updateUI() {
-    // Timer text
     renderTime(getRemainingMs());
-    // Cycle label
     cycleLabelEl.textContent = `${state.cycleIndex} / ${prefs.longEvery}`;
-    // Today count
     state.todayPomodoros = getTodayPomodoros();
     todayCountEl.textContent = state.todayPomodoros.toString();
-    // Buttons states
     startBtn.disabled = state.running;
     pauseBtn.disabled = !state.running;
-    // Settings inputs
     workMinsEl.value = prefs.work;
     shortMinsEl.value = prefs.short;
     longMinsEl.value = prefs.long;
@@ -311,7 +290,6 @@ Features:
     const m = Math.floor(total / 60);
     const s = total % 60;
     countdownEl.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-    // Set document title to glance on tab
     document.title = `${countdownEl.textContent} • ${capitalize(state.mode)} • Pomodoro`;
   }
 
@@ -328,7 +306,6 @@ Features:
 
   function savePrefs() {
     localStorage.setItem(LS_PREF, JSON.stringify(prefs));
-    // apply CSS brand
     document.documentElement.style.setProperty('--brand', prefs.themeColor || defaultPrefs.themeColor);
   }
   function loadPrefs() {
@@ -377,7 +354,6 @@ Features:
     }
   }
 
-  // Web Audio chime (no external file)
   let audioCtx;
   function playChime(type = 'end') {
     if (prefs.sound === 'off') return;
@@ -390,7 +366,6 @@ Features:
       const volume = (prefs.sound === 'quiet') ? 0.04 : (prefs.sound === 'loud' ? 0.18 : 0.09);
       gain.gain.setValueAtTime(volume, now);
 
-      // different motif for end/work/break
       const pattern = (type === 'work')
         ? [660, 880, 660]
         : (type === 'break')
@@ -405,7 +380,6 @@ Features:
         osc.frequency.setValueAtTime(freq, t);
         t += 0.12 + (i * 0.02);
       });
-      // quick fade out
       gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.05);
       osc.start(now);
       osc.stop(t + 0.06);
@@ -425,7 +399,6 @@ Features:
     localStorage.setItem(LS_HISTORY, JSON.stringify(hist));
   }
   function dateKey(d = new Date()) {
-    // yyyy-mm-dd local
     const y = d.getFullYear();
     const m = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
@@ -461,13 +434,19 @@ Features:
     return keys;
   }
 
+  // ✅ Responsive Chart
   function drawChart() {
-    const ctx = weekChart.getContext('2d');
-    const w = weekChart.width;
-    const h = weekChart.height;
-    // clear
+    const canvas = weekChart;
+    const ctx = canvas.getContext('2d');
+
+    const container = canvas.parentElement;
+    canvas.width = container.clientWidth;
+    canvas.height = 220;
+
+    const w = canvas.width;
+    const h = canvas.height;
+
     ctx.clearRect(0,0,w,h);
-    // bg grid
     ctx.fillStyle = 'rgba(255,255,255,0.04)';
     ctx.fillRect(0,0,w,h);
 
@@ -479,7 +458,6 @@ Features:
     const chartW = w - pad*2;
     const chartH = h - pad*2;
 
-    // axes
     ctx.strokeStyle = 'rgba(255,255,255,0.2)';
     ctx.lineWidth = 1;
     ctx.beginPath();
@@ -488,7 +466,6 @@ Features:
     ctx.lineTo(w - pad, h - pad);
     ctx.stroke();
 
-    // bars
     const gap = 12;
     const barW = (chartW - gap * (values.length - 1)) / values.length;
     const brand = getComputedStyle(document.documentElement).getPropertyValue('--brand').trim() || '#4f46e5';
@@ -496,13 +473,11 @@ Features:
       const x = pad + i * (barW + gap);
       const barH = (v / max) * (chartH - 8);
       const y = (h - pad) - barH;
-      // bar
       ctx.fillStyle = brand;
       ctx.fillRect(x, y, barW, barH);
-      // label
       ctx.fillStyle = 'rgba(230,233,245,0.85)';
       ctx.font = '12px system-ui, sans-serif';
-      const day = labels[i].slice(5); // mm-dd
+      const day = labels[i].slice(5);
       ctx.fillText(day, x, h - pad + 16);
       if (v > 0) ctx.fillText(String(v), x, y - 6);
     });
@@ -512,17 +487,28 @@ Features:
     const hist = getHistory();
     const rows = [['date','pomodoros']];
     Object.keys(hist).sort().forEach(k => rows.push([k, hist[k]]));
+
+  
+    // if no history, still give a sample row
+    if (rows.length === 1) {
+      rows.push([dateKey(), 0]);
+    }
+
     const csv = rows.map(r => r.join(',')).join('\n');
     const blob = new Blob([csv], { type:'text/csv' });
     const url = URL.createObjectURL(blob);
+
     const a = document.createElement('a');
-    a.href = url; a.download = 'pomodoro_history.csv';
+    a.href = url; 
+    a.download = 'pomodoro_history.csv';
     document.body.appendChild(a);
     a.click();
-    requestAnimationFrame(() => {
+
+    // cleanup
+    setTimeout(() => {
       URL.revokeObjectURL(url);
       a.remove();
-    });
+    }, 0);
   }
 
   // ---------- Helpers ----------
@@ -533,7 +519,8 @@ Features:
   }
   function capitalize(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
 
-  // Initial draw
+  // Initial draw + responsive resize
   drawChart();
+  window.addEventListener('resize', drawChart);
 
 })();
