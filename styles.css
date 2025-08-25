@@ -20,19 +20,23 @@ body{
   background: radial-gradient(1200px 800px at 80% -100px, #1b264f 10%, var(--bg) 60%);
 }
 
+/* HEADER */
 .app-header{
   display:flex; align-items:center; justify-content:space-between;
   padding:16px 20px; border-bottom:1px solid rgba(255,255,255,.06);
   background: rgba(0,0,0,.2); backdrop-filter: blur(6px);
+  flex-wrap: wrap;
+  gap: 12px;
 }
-.brand{ display:flex; align-items:center; gap:12px; }
+.brand{ display:flex; align-items:center; gap:12px; flex:1 1 auto; }
 .brand h1{ margin:0; font-size:1.25rem; letter-spacing:.3px; }
 .brand img{ width:28px; height:28px; object-fit:contain; display:none; }
 
-.brand-controls{ display:flex; gap:10px; align-items:end; flex-wrap:wrap; }
-.inline{ display:flex; gap:8px; align-items:center; color: var(--muted); font-size:.9rem; }
-.inline input[type="url"]{ width:260px; }
+.brand-controls{ display:flex; gap:10px; align-items:end; flex-wrap:wrap; flex:1 1 100%; }
+.inline{ display:flex; gap:8px; align-items:center; color: var(--muted); font-size:.9rem; flex:1; }
+.inline input[type="url"]{ width:100%; min-width:180px; }
 
+/* LAYOUT */
 .container{
   display:grid; gap:20px; grid-template-columns: 1fr; padding: 24px;
   max-width: 980px; margin: 0 auto;
@@ -46,7 +50,8 @@ body{
   padding: 16px;
 }
 
-.mode-tabs{ display:flex; gap:8px; }
+/* TIMER */
+.mode-tabs{ display:flex; gap:8px; flex-wrap: wrap; }
 .tab{
   background: transparent; color: var(--muted);
   border:1px solid rgba(255,255,255,.12); padding:10px 12px;
@@ -67,8 +72,10 @@ body{
 }
 .cycle-info{
   display:flex; gap:18px; justify-content:center; color: var(--muted);
+  flex-wrap: wrap;
 }
 
+/* CONTROLS */
 .controls{ display:flex; gap:10px; justify-content:center; padding: 10px 0 2px; flex-wrap: wrap; }
 
 .btn{
@@ -81,18 +88,20 @@ body{
 .btn.danger{ background: color-mix(in oklab, var(--danger) 35%, transparent); border-color: var(--danger); }
 .btn.sm{ padding:8px 12px; font-size:.9rem; }
 
+/* SETTINGS */
 .settings{ margin-top: 6px; }
 .settings summary{ cursor:pointer; color: var(--accent); }
-.settings .grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px; margin-top:10px; }
+.settings .grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap:10px; margin-top:10px; }
 .settings input, .settings select{
   width:100%; padding:10px; border-radius:10px; border:1px solid rgba(255,255,255,.12);
   background: rgba(255,255,255,.04); color:white;
 }
 .checkbox{ display:flex; align-items:center; gap:8px; user-select:none; }
 
+/* REPORT */
 .report-card h2{ margin-top:2px; }
 .stats{
-  display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px; margin-bottom: 8px;
+  display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:10px; margin-bottom: 8px;
 }
 .stat{
   border:1px solid rgba(255,255,255,.08); border-radius: 14px; padding:12px;
@@ -101,14 +110,21 @@ body{
 .stat-value{ font-size: 28px; font-weight: 700; }
 .stat-label{ color: var(--muted); font-size:.9rem; }
 
-.export-row{ display:flex; gap:8px; margin-top: 10px; }
+#weekChart{ width: 100%; height: auto; max-width: 100%; }
 
+.export-row{ display:flex; gap:8px; margin-top: 10px; flex-wrap: wrap; }
+
+/* FOOTER */
 .app-footer{
   padding: 14px 20px; color: var(--muted); text-align:center;
   border-top:1px solid rgba(255,255,255,.06); margin-top: 10px;
+  font-size: 0.85rem;
 }
 
 /* Responsive tweaks */
+@media (min-width: 700px){
+  .brand-controls{ flex:1; }
+}
 @media (min-width: 900px){
   .container{ grid-template-columns: 1.1fr .9fr; }
 }
