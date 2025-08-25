@@ -110,7 +110,13 @@ body{
 .stat-value{ font-size: 28px; font-weight: 700; }
 .stat-label{ color: var(--muted); font-size:.9rem; }
 
-#weekChart{ width: 100%; height: auto; max-width: 100%; }
+/* ✅ Responsive Chart */
+#weekChart{
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100%;
+  display: block;
+}
 
 .export-row{ display:flex; gap:8px; margin-top: 10px; flex-wrap: wrap; }
 
