@@ -1,0 +1,116 @@
+:root{
+  --brand: #4f46e5;
+  --bg: #0b1020;
+  --panel: #121a33;
+  --text: #e6e9f5;
+  --muted: #9aa3bc;
+  --accent: #22d3ee;
+  --danger: #ef4444;
+  --ok: #10b981;
+  --shadow: 0 10px 30px rgba(0,0,0,.35);
+  --radius: 16px;
+}
+
+*{ box-sizing: border-box; }
+html, body { height: 100%; }
+body{
+  margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+  color: var(--text);
+  background: radial-gradient(1200px 800px at 80% -100px, #1b264f 10%, var(--bg) 60%);
+}
+
+.app-header{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 20px; border-bottom:1px solid rgba(255,255,255,.06);
+  background: rgba(0,0,0,.2); backdrop-filter: blur(6px);
+}
+.brand{ display:flex; align-items:center; gap:12px; }
+.brand h1{ margin:0; font-size:1.25rem; letter-spacing:.3px; }
+.brand img{ width:28px; height:28px; object-fit:contain; display:none; }
+
+.brand-controls{ display:flex; gap:10px; align-items:end; flex-wrap:wrap; }
+.inline{ display:flex; gap:8px; align-items:center; color: var(--muted); font-size:.9rem; }
+.inline input[type="url"]{ width:260px; }
+
+.container{
+  display:grid; gap:20px; grid-template-columns: 1fr; padding: 24px;
+  max-width: 980px; margin: 0 auto;
+}
+
+.timer-card, .report-card{
+  background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.0));
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
+}
+
+.mode-tabs{ display:flex; gap:8px; }
+.tab{
+  background: transparent; color: var(--muted);
+  border:1px solid rgba(255,255,255,.12); padding:10px 12px;
+  border-radius: 999px; cursor:pointer; transition: .2s;
+}
+.tab.active, .tab:hover{
+  color:white; border-color: var(--brand); box-shadow: 0 0 0 2px color-mix(in oklab, var(--brand) 30%, transparent);
+}
+
+.timer-display{
+  text-align:center; padding: 10px 0 0 0;
+}
+#countdown{
+  font-size: clamp(48px, 8vw, 120px);
+  font-weight: 800; letter-spacing: 2px;
+  line-height: 1.1; margin: 8px 0 2px;
+  text-shadow: 0 6px 40px rgba(0,0,0,.35);
+}
+.cycle-info{
+  display:flex; gap:18px; justify-content:center; color: var(--muted);
+}
+
+.controls{ display:flex; gap:10px; justify-content:center; padding: 10px 0 2px; flex-wrap: wrap; }
+
+.btn{
+  background: rgba(255,255,255,.06);
+  color: white; border:1px solid rgba(255,255,255,.12);
+  border-radius: 12px; padding:10px 16px; cursor:pointer; transition: .2s;
+}
+.btn:hover{ transform: translateY(-1px); border-color: var(--brand); }
+.btn.primary{ background: color-mix(in oklab, var(--brand) 35%, transparent); border-color: var(--brand); }
+.btn.danger{ background: color-mix(in oklab, var(--danger) 35%, transparent); border-color: var(--danger); }
+.btn.sm{ padding:8px 12px; font-size:.9rem; }
+
+.settings{ margin-top: 6px; }
+.settings summary{ cursor:pointer; color: var(--accent); }
+.settings .grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px; margin-top:10px; }
+.settings input, .settings select{
+  width:100%; padding:10px; border-radius:10px; border:1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.04); color:white;
+}
+.checkbox{ display:flex; align-items:center; gap:8px; user-select:none; }
+
+.report-card h2{ margin-top:2px; }
+.stats{
+  display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px; margin-bottom: 8px;
+}
+.stat{
+  border:1px solid rgba(255,255,255,.08); border-radius: 14px; padding:12px;
+  background: rgba(255,255,255,.03);
+}
+.stat-value{ font-size: 28px; font-weight: 700; }
+.stat-label{ color: var(--muted); font-size:.9rem; }
+
+.export-row{ display:flex; gap:8px; margin-top: 10px; }
+
+.app-footer{
+  padding: 14px 20px; color: var(--muted); text-align:center;
+  border-top:1px solid rgba(255,255,255,.06); margin-top: 10px;
+}
+
+/* Responsive tweaks */
+@media (min-width: 900px){
+  .container{ grid-template-columns: 1.1fr .9fr; }
+}
+
+:focus-visible{ outline: 2px solid var(--brand); outline-offset: 2px; }
